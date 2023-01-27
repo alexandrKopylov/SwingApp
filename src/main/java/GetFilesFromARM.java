@@ -24,11 +24,17 @@ public class GetFilesFromARM extends JFrame {
 
     Predicate<Poziciya> filterThickness;
     Predicate<Poziciya> filterInv;
+    Predicate<Poziciya> filterMore;
+    Predicate<Poziciya> filterContains;
+
 
     boolean flagThickness;
     boolean flagInv;
 
     List<Poziciya> list = new ArrayList<>();
+    List<Poziciya> filterListPoz;
+
+
     int count;
 
     private int maxLengthFileName;
@@ -50,6 +56,11 @@ public class GetFilesFromARM extends JFrame {
     private JButton notFilesButton;
     private JCheckBox pozCheckBox;
     private JTextField mosinTextField;
+    private JCheckBox moreCheckBox;
+    private JTextField moreTextField;
+    private JCheckBox containsCheckBox;
+    private JTextField containsTextField;
+    private JButton fileMosinToDXFButton;
     private List<String> thickness;
     private List<String> tmpInvList;
     private static final String[] mashines = {"F", "F12", "KF", "L"};
@@ -60,13 +71,24 @@ public class GetFilesFromARM extends JFrame {
     //construktor
     public GetFilesFromARM() {
 
+        filterMore = n -> {
+            if (moreCheckBox.isSelected()) {
+                return (n.getCountN() + n.getCountT()) >= Integer.parseInt(moreTextField.getText());
+            }
+            return true;
+        };
+        filterContains = n -> {
+            if (containsCheckBox.isSelected()) {
+                return n.getFileName().contains(containsTextField.getText().toUpperCase());
+            }
+            return true;
+        };
         filterThickness = n -> {
             if (getThickness.getSelectedIndex() == 0) {
                 return true;
             }
             return n.getGabariti().startsWith(thickness.get(getThickness.getSelectedIndex()));
         };
-
         filterInv = n -> {
             if (invList.getSelectedIndex() == 0) {
                 return true;
@@ -81,7 +103,6 @@ public class GetFilesFromARM extends JFrame {
 
             if (list.isEmpty()) {
                 readCSV(fileCSV);
-
                 if (thickness == null) {
                     thickness = new ArrayList<>(thicknessSet);
                     thickness.add(0, "All");
@@ -97,9 +118,8 @@ public class GetFilesFromARM extends JFrame {
                 poz.setFlagSearchDXF(false);
             }
 
-
             ViewCSV();
-            //    System.out.println(list);
+
         });
 
         searchDXFButton.addActionListener(e -> {
@@ -115,29 +135,19 @@ public class GetFilesFromARM extends JFrame {
 
             maxLengthFileName = 0;
 
-            list.stream()
+//            list.stream()
+//                    .filter(Poziciya::isFlagSearchDXF)
+//                    .filter(x -> x.getAbslutFileName() == null)
+//                    .filter(filterThickness)
+//                    .filter(filterInv)
+//                    .forEach(this::searchFiles);
+
+            filterListPoz.stream()
                     .filter(Poziciya::isFlagSearchDXF)
                     .filter(x -> x.getAbslutFileName() == null)
-                    .filter(filterThickness)
-                    .filter(filterInv)
                     .forEach(this::searchFiles);
 
-//            System.out.println(ttt);
-//
-//            for (Poziciya p : list) {
-//                if (p.isFlagSearchDXF()) {
-//                    if (p.getAbslutFileName() == null) {
-//                        if (flagThickness) {
-//                            searchFiles(p);
-//                        } else {
-//                            if (p.getGabariti().startsWith(thickness.get(getThickness.getSelectedIndex()))) {
-//                                searchFiles(p);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-            //  System.out.println(list);
+
             viewSearchFiles();
         });
 
@@ -156,6 +166,12 @@ public class GetFilesFromARM extends JFrame {
             }
         });
 
+        fileMosinToDXFButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
     }
 
 
@@ -174,10 +190,10 @@ public class GetFilesFromARM extends JFrame {
 
     private void searchDXF() {
         // 1 - удаляем старые файлы в папке DXF
-        for (File file : Objects.requireNonNull(folderMyDXF.toFile().listFiles()))
-            if (!file.isDirectory()) {
-                file.delete();
-            }
+//        for (File file : Objects.requireNonNull(folderMyDXF.toFile().listFiles()))
+//            if (!file.isDirectory()) {
+//                file.delete();
+//            }
 
 
         Predicate<Path> condition = n -> {
@@ -186,11 +202,7 @@ public class GetFilesFromARM extends JFrame {
             }
             return !Character.isDigit(n.toFile().getName().charAt(0));
         };
-
-
         List<Path> listPathDXF;
-
-
         try {
             listPathDXF = Files.walk(folderMosinPlusFolderZakaz)
                     .filter(Files::isRegularFile)
@@ -205,7 +217,7 @@ public class GetFilesFromARM extends JFrame {
 
         List<Poziciya> tmpList =
                 list.stream()
-                        .filter(x->x.getFileName().equals("NOT FILE"))
+                        .filter(x -> x.getFileName().equals("NOT FILE"))
                         .filter(filterThickness)
                         .filter(filterInv)
                         .collect(Collectors.toList());
@@ -221,7 +233,7 @@ public class GetFilesFromARM extends JFrame {
     }
 
     private void copyFileToSwingDxfFolder(Poziciya poz, Path path) {
-        Path pathTarget = folderDXF.resolve(Path.of(poz.getName() + ".dxf"));
+        Path pathTarget = folderMyDXF.resolve(Path.of(poz.getName() + ".dxf"));
         try {
             Files.copy(path, pathTarget, REPLACE_EXISTING); // , COPY_ATTRIBUTES, NOFOLLOW_LINKS);
         } catch (IOException e) {
@@ -268,7 +280,7 @@ public class GetFilesFromARM extends JFrame {
 
         List<Poziciya> tmpList =
                 list.stream()
-                        .filter(x->x.getFileName().equals("NOT FILE"))
+                        .filter(x -> x.getFileName().equals("NOT FILE"))
                         .filter(filterThickness)
                         .filter(filterInv)
                         .collect(Collectors.toList());
@@ -322,13 +334,6 @@ public class GetFilesFromARM extends JFrame {
 
 
     private void copyFilesInDXFfolder() {
-
-        // 1 - удаляем старые файлы в папке DXF
-        for (File file : Objects.requireNonNull(folderMyDXF.toFile().listFiles()))
-            if (!file.isDirectory()) {
-                file.delete();
-            }
-
 
         list.stream()
                 .filter(Poziciya::isFlagSearchDXF)
@@ -442,7 +447,7 @@ public class GetFilesFromARM extends JFrame {
                 .filter(filterInv)
                 .filter(poz -> poz.getStatus().equals("---"))
                 .count();
-        for(Poziciya poz :tmpListPoz){
+        for (Poziciya poz : tmpListPoz) {
             textArea1.append(viewPoziciya(poz));
         }
         textArea1.append("   -----------------------------------------------------------------------");
@@ -479,10 +484,15 @@ public class GetFilesFromARM extends JFrame {
 
         // flagThickness = getThickness.getSelectedIndex() == 0;
         //flagInv = invList.getSelectedIndex() == 0;
-        list.stream()
+        filterListPoz = list.stream()
                 .filter(filterThickness)
                 .filter(filterInv)
-                .forEach(this::viewPoz);
+                .filter(filterMore)
+                .filter(filterContains)
+                // .forEach(this::viewPoz);
+                .collect(Collectors.toList());
+
+        filterListPoz.forEach(this::viewPoz);
         textArea1.append(System.lineSeparator());
         textArea1.append("   записей = " + count);
     }
@@ -515,20 +525,6 @@ public class GetFilesFromARM extends JFrame {
     }
 
 
-    private void sortFicep() {
-        list.stream()
-                .sorted()
-                .forEach(x -> System.out.printf("%s -  %d%n",
-                        x.getFileName().replace(".dxf", ""),
-                        x.getCountT() + x.getCountN()
-                ));
-        System.out.println();
-        System.out.println("count = " + list.size());
-
-
-    }
-
-
     private void searchFiles(Poziciya poz) {
         Path rootFilePath = pathBazaDXF.resolve(Path.of(poz.getInv()));
         File rootFile = rootFilePath.toFile();
@@ -545,29 +541,29 @@ public class GetFilesFromARM extends JFrame {
                 if (directoryFiles != null) {
                     // ishem  1 sposobom
                     metodSearchFiles(directoryFiles, searchFileName, poz, litera);
+
+                    //esali fail ne nashelsya togda  ishem 2 sposob
                     if (!poz.getStatus().equals("OK")) {
                         searchFileName = "." + poz.getName() + litera + ".dxf";
-                        //esali fail ne nashelsya togda  ishem 2 sposob
                         metodSearchFiles(directoryFiles, searchFileName, poz, litera);
                     }
                 }
             }
         } else {
             for (int i = selectMashines; i > -1; i--) {
-                litera = mashines[selectMashines];
-                String name = chekNameFromCSV(poz);
-                String searchFileName = name + litera + ".dxf";
+                String searchFileName = chekNameFromCSV(poz) + mashines[selectMashines] + ".dxf";
                 if (rootFile.isDirectory()) {
                     File[] directoryFiles = rootFile.listFiles();
                     if (directoryFiles != null) {
+
                         // ishem  1 sposobom
                         if (metodSearchFiles(directoryFiles, searchFileName, poz, litera)) {
                             break;
                         }
+
+                        //esali fail ne nashelsya togda  ishem 2 sposob
                         if (!poz.getStatus().equals("OK")) {
-                            searchFileName = "." + poz.getName() + litera + ".dxf";
-                            //esali fail ne nashelsya togda  ishem 2 sposob
-                            if (metodSearchFiles(directoryFiles, searchFileName, poz, litera)) {
+                            if (metodSearchFiles(directoryFiles, "." + poz.getName() + litera + ".dxf", poz, litera)) {
                                 break;
                             }
                         }
