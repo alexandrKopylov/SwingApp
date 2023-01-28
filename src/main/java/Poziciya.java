@@ -10,7 +10,7 @@ public class Poziciya implements Comparable<Poziciya> {
     private String geomMashines;
     private String fileName = "NOT FILE";
     private Path abslutFileName;
-    private boolean flagSearchDXF;
+  //  private boolean flagSearchDXF;
     private String flagPDF;
     private String flagDXF;
 
@@ -37,14 +37,14 @@ public class Poziciya implements Comparable<Poziciya> {
     public void setFlagDXF(String flagDXF) {
         this.flagDXF = flagDXF;
     }
-
-    public boolean isFlagSearchDXF() {
-        return flagSearchDXF;
-    }
-
-    public void setFlagSearchDXF(boolean flagSearchDXF) {
-        this.flagSearchDXF = flagSearchDXF;
-    }
+//
+//    public boolean isFlagSearchDXF() {
+//        return flagSearchDXF;
+//    }
+//
+//    public void setFlagSearchDXF(boolean flagSearchDXF) {
+//        this.flagSearchDXF = flagSearchDXF;
+//    }
 
     public String getFileName() {
         return fileName;
@@ -104,10 +104,10 @@ public class Poziciya implements Comparable<Poziciya> {
         this.geomMashines = geomMashines;
     }
 
-    @Override
-    public String toString() {
-        return inv + "  " + name + "  " + flagSearchDXF + "   "  + System.lineSeparator();
-    }
+//    @Override
+//    public String toString() {
+//        return inv + "  " + name + "  " + flagSearchDXF + "   "  + System.lineSeparator();
+//    }
 
     @Override
     public int compareTo(Poziciya o) {
