@@ -12,21 +12,22 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class GetFilesFromARM extends JFrame {
     // na rabote
-//    File fileCSV = new File("c:\\Users\\alexx\\Desktop\\ДеталиБК_все.csv");
-//    Path pathBazaDXF = Path.of("z:\\BAZA\\DXF");
-//    Path folderMyDXF = Path.of("C:\\Program Files\\AutoCAD 2010\\_DXF\\");
-//    Path saveText = Path.of("C:\\Users\\alexx\\Desktop\\Swing");
-//    Path folderPDF = Path.of("C:\\Users\\alexx\\Desktop\\Swing\\PDF");
-//    Path folderMosinPlusFolderZakaz;
-
-    File fileCSV = new File("C:\\Users\\user\\Desktop\\work\\work\\ДеталиБК_все.csv");   //"c:\\Users\\alexx\\Desktop\\ДеталиБК_все.csv");
-    Path pathBazaDXF = Path.of("C:\\Users\\user\\Desktop\\work\\work\\BAZA");          //"z:\\BAZA\\DXF");
-    Path folderMyDXF = Path.of("C:\\Users\\user\\Desktop\\Swing\\DXFprogramfiles");         //"C:\\Program Files\\AutoCAD 2010\\_DXF\\");
-    Path saveText = Path.of("C:\\Users\\user\\Desktop\\Swing");
-    Path folderPDF = Path.of("C:\\Users\\user\\Desktop\\Swing\\PDF");
+    File fileCSV = new File("c:\\Users\\alexx\\Desktop\\ДеталиБК_все.csv");
+    Path pathBazaDXF = Path.of("z:\\BAZA\\DXF");
+    Path folderMyDXF = Path.of("C:\\Program Files\\AutoCAD 2010\\_DXF\\");
+    Path saveText = Path.of("C:\\Users\\alexx\\Desktop\\Swing");
+    Path folderPDF = Path.of("C:\\Users\\alexx\\Desktop\\Swing\\PDF");
     Path folderMosinPlusFolderZakaz;
 
+         // doma
+//    File fileCSV = new File("C:\\Users\\user\\Desktop\\work\\work\\ДеталиБК_все.csv");   //"c:\\Users\\alexx\\Desktop\\ДеталиБК_все.csv");
+//    Path pathBazaDXF = Path.of("C:\\Users\\user\\Desktop\\work\\work\\BAZA");          //"z:\\BAZA\\DXF");
+//    Path folderMyDXF = Path.of("C:\\Users\\user\\Desktop\\Swing\\DXFprogramfiles");         //"C:\\Program Files\\AutoCAD 2010\\_DXF\\");
+//    Path saveText = Path.of("C:\\Users\\user\\Desktop\\Swing");
+//    Path folderPDF = Path.of("C:\\Users\\user\\Desktop\\Swing\\PDF");
+//    Path folderMosinPlusFolderZakaz;
 
+    Predicate<Poziciya> filterNOTFILE;
     Predicate<Poziciya> filterThickness;
     Predicate<Poziciya> filterInv;
     Predicate<Poziciya> filterMore;
@@ -65,6 +66,7 @@ public class GetFilesFromARM extends JFrame {
     private JTextField moreTextField;
     private JCheckBox containsCheckBox;
     private JTextField containsTextField;
+    private JCheckBox hideNOTFILECheckBox;
     private List<String> thickness;
     private List<String> tmpInvList;
     private static final String[] mashines = {"F", "F12", "KF", "L"};
@@ -74,6 +76,12 @@ public class GetFilesFromARM extends JFrame {
 
     //construktor
     public GetFilesFromARM() {
+        filterNOTFILE = n->{
+            if(hideNOTFILECheckBox.isSelected()){
+                return !n.getFileName().equals("NOT FILE");
+            }
+            return true;
+        };
 
         filterMore = n -> {
             if (moreCheckBox.isSelected()) {
@@ -436,7 +444,9 @@ public class GetFilesFromARM extends JFrame {
                 .count();
 
         for (Poziciya poz : filterListPoz) {
-            textArea1.append(viewPoziciya(poz));
+            if(filterNOTFILE.test(poz)) {
+                textArea1.append(viewPoziciya(poz));
+            }
         }
         textArea1.append("   -----------------------------------------------------------------------");
         textArea1.append(System.lineSeparator());
