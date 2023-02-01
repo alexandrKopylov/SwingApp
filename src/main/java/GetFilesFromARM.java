@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,7 +38,7 @@ public class GetFilesFromARM extends JFrame {
     List<Poziciya> list = new ArrayList<>();
     List<Poziciya> filterListPoz;
     List<String> listPrintPoz;
-
+    int flagViewNull;
     int count;
 
     private int maxLengthFileName;
@@ -63,6 +65,7 @@ public class GetFilesFromARM extends JFrame {
     private JCheckBox containsCheckBox;
     private JTextField containsTextField;
     private JCheckBox hideNOTFILECheckBox;
+    private JButton NULLOnOfflButton;
     private List<String> thickness;
     private List<String> tmpInvList;
     private static final String[] mashines = {"F", "F12", "KF", "L"};
@@ -87,10 +90,16 @@ public class GetFilesFromARM extends JFrame {
         };
         filterContains = n -> {
             if (containsCheckBox.isSelected()) {
-                return n.getName().contains(containsTextField.getText().toUpperCase());
+                String[] strMas = containsTextField.getText().split(" ");
+                if (strMas[0].equals("not")) {
+                    return !n.getName().contains(strMas[1]);
+                } else {
+                    return n.getName().contains(strMas[0]);
+                }
             }
             return true;
         };
+
         filterThickness = n -> {
             if (getThickness.getSelectedIndex() == 0) {
                 return true;
@@ -157,6 +166,25 @@ public class GetFilesFromARM extends JFrame {
         });
 
 
+        NULLOnOfflButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (flagViewNull == 0) {
+                    textArea1.setText("");
+                    for(Poziciya poz: filterListPoz) {
+                        if (poz.getFlagDXF() == null) {
+                            textArea1.append(viewPoziciya(poz));
+                        }
+                    }
+                    flagViewNull = 1;
+                } else {
+                    viewSearchFiles();
+                    flagViewNull = 0;
+                }
+
+            }
+        });
     }
 
 
@@ -173,19 +201,21 @@ public class GetFilesFromARM extends JFrame {
 
     private void searchDXF() {
 
-        Predicate<Path> condition = n -> {
+        Predicate<Path> filterPoziciya = n -> {
             if (pozCheckBox.isSelected()) {
                 return true;
             }
             return !Character.isDigit(n.toFile().getName().charAt(0));
         };
+
         List<Path> listPathDXF;
+
         try {
             listPathDXF = Files.walk(folderMosinPlusFolderZakaz)
                     .filter(Files::isRegularFile)
                     // .map(Path::toString)
                     .filter(x -> x.toFile().getName().endsWith(".dxf"))
-                    .filter(condition)                                           //  поз или не поз
+                    .filter(filterPoziciya)                                           //  поз или не поз
                     .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -205,6 +235,7 @@ public class GetFilesFromARM extends JFrame {
                     break;
                 }
             }
+            poz.setFileName(poz.getName() + ".dxf");
         }
     }
 

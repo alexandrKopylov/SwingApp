@@ -3,7 +3,13 @@ import java.nio.file.Path;
 
 public class Test {
     public static void main(String[] args) {
-        String str = "r22-798";
+       // String str = "r22-798";
+
+        String[] strMas = "jjjkkyyy".split(" ");
+
+        System.out.println(strMas[0]);
+
+
 
       // System.out.println(str.charAt(0));
 
