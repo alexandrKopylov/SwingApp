@@ -1,30 +1,26 @@
 import java.io.File;
 import java.nio.file.Path;
+import java.util.concurrent.Semaphore;
 
 public class Test {
-    public static void main(String[] args) {
-       // String str = "r22-798";
+    public static void main(String[] args) throws InterruptedException {
+        Semaphore sem = new Semaphore(0);
+        Runnable task = () -> {
+            try {
+                sem.acquire();
+                System.out.println("Нить выполнила задачу");
+                System.out.println(Thread.currentThread().getName());
+                Thread.sleep(5000);
 
-        String[] strMas = "jjjkkyyy".split(" ");
-
-        System.out.println(strMas[0]);
-
-
-
-      // System.out.println(str.charAt(0));
-
-      //  isDigit = (c >= '0' && c <= '9');
-
-       // System.out.println(  Character.isDigit(str.charAt(0)) );
-       // return n.getFileName().contains(containsTextField.getText().toUpperCase());
-
-//
-//        filterListPoz = list.stream()
-//                .filter(filterThickness)
-//                .filter(filterInv)
-//                .filter(filterMore)
-//                .filter(filterContains)
-
-
+                sem.release();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        };
+        new Thread(task).start();
+        new  Thread(task).start();
+        new Thread(task).start();
+      //  Thread.sleep(3000);
+        sem.release(2);
     }
 }

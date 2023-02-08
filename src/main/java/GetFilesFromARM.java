@@ -81,17 +81,22 @@ public class GetFilesFromARM extends JFrame {
             }
             return true;
         };
-
         filterMore = n -> {
             if (moreCheckBox.isSelected()) {
-                return (n.getCountN() + n.getCountT()) >= Integer.parseInt(moreTextField.getText());
+                String[] strMas = moreTextField.getText().split(" ");
+                int sum = n.getCountN() + n.getCountT();
+                if (strMas[0].equals("!")) {
+                    return !(sum >= Integer.parseInt(strMas[1]));
+                } else {
+                    return sum >= Integer.parseInt(strMas[0]);
+                }
             }
             return true;
         };
         filterContains = n -> {
             if (containsCheckBox.isSelected()) {
                 String[] strMas = containsTextField.getText().split(" ");
-                if (strMas[0].equals("not")) {
+                if (strMas[0].equals("!")) {
                     return !n.getName().contains(strMas[1]);
                 } else {
                     return n.getName().contains(strMas[0]);
@@ -99,7 +104,6 @@ public class GetFilesFromARM extends JFrame {
             }
             return true;
         };
-
         filterThickness = n -> {
             if (getThickness.getSelectedIndex() == 0) {
                 return true;
@@ -172,7 +176,7 @@ public class GetFilesFromARM extends JFrame {
 
                 if (flagViewNull == 0) {
                     textArea1.setText("");
-                    for(Poziciya poz: filterListPoz) {
+                    for (Poziciya poz : filterListPoz) {
                         if (poz.getFlagDXF() == null) {
                             textArea1.append(viewPoziciya(poz));
                         }
@@ -182,6 +186,7 @@ public class GetFilesFromARM extends JFrame {
                     viewSearchFiles();
                     flagViewNull = 0;
                 }
+
 
             }
         });
@@ -298,6 +303,10 @@ public class GetFilesFromARM extends JFrame {
 
 
     private void copyFilesInDXFfolder() {
+        for (File file : Objects.requireNonNull(folderMyDXF.toFile().listFiles()))
+            if (!file.isDirectory()) {
+                file.delete();
+            }
         filterListPoz.forEach(this::copyPoz);
     }
 
@@ -446,7 +455,7 @@ public class GetFilesFromARM extends JFrame {
                 if (rootFile.isDirectory()) {
                     File[] directoryFiles = rootFile.listFiles();
                     if (directoryFiles != null) {
-
+                        litera = mashines[selectMashines];
                         // ishem  1 sposobom
                         if (metodSearchFiles(directoryFiles, searchFileName, poz, litera)) {
                             break;
@@ -480,7 +489,8 @@ public class GetFilesFromARM extends JFrame {
                     // -4  отбрасываем  расширение .dxf
                     maxLengthFileName = Math.max(maxLengthFileName, realFileName.length() - 4);
                     poz.setFileName(realFileName);
-                    poz.setGeomMashines(litera);
+                    String literaWithProbel = litera + " ".repeat(5 - litera.length());
+                    poz.setGeomMashines(literaWithProbel);
                     found = true;
                     break;
                 }
