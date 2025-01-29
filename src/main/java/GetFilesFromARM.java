@@ -66,6 +66,9 @@ public class GetFilesFromARM extends JFrame {
     private JTextField containsTextField;
     private JCheckBox hideNOTFILECheckBox;
     private JButton NULLOnOfflButton;
+    private JCheckBox singlSearchCheckBox;
+    private JTextField textFieldSinglSearch;
+    private JCheckBox viewPDFDXFCheckBox;
     private List<String> thickness;
     private List<String> tmpInvList;
     private static final String[] mashines = {"F", "F12", "KF", "L"};
@@ -190,6 +193,63 @@ public class GetFilesFromARM extends JFrame {
 
             }
         });
+    }
+
+    private void singlSearch() {
+
+        boolean boolPDF = false;
+        boolean boolDXF = false;
+
+        List<Path> singlsearh;
+        try {
+            //  теперь нам нужны из этой папки все файлы pdf
+            singlsearh = Files.walk(folderMosinPlusFolderZakaz)
+                    .filter(Files::isRegularFile)
+                    // .map(Path::toString)
+                    .filter(x -> x.toFile().getName().endsWith(textFieldSinglSearch.getText() + ".pdf"))
+                    //.filter(x->x.endsWith(textFieldSinglSearch.getText()))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        if (singlsearh.size() == 1) {
+            Path pathTarget = folderMyDXF.resolve(Path.of(textFieldSinglSearch.getText() + ".pdf"));
+            try {
+                Files.copy(singlsearh.get(0), pathTarget, REPLACE_EXISTING);      // , COPY_ATTRIBUTES, NOFOLLOW_LINKS);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            boolPDF = true;
+        }
+
+        List<Path> listPathDXF;
+        try {
+            listPathDXF = Files.walk(folderMosinPlusFolderZakaz)
+                    .filter(Files::isRegularFile)
+                    // .map(Path::toString)
+                    .filter(x -> x.toFile().getName().endsWith(textFieldSinglSearch.getText() + ".dxf"))
+                    // .filter(filterPoziciya)                                           //  поз или не поз
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        if (listPathDXF.size() == 1) {
+            Path pathTarget = folderMyDXF.resolve(Path.of(textFieldSinglSearch.getText() + ".dxf"));
+            try {
+                Files.copy(listPathDXF.get(0), pathTarget, REPLACE_EXISTING);      // , COPY_ATTRIBUTES, NOFOLLOW_LINKS);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            boolDXF = true;
+        }
+
+        JOptionPane.showMessageDialog(null,
+                textFieldSinglSearch.getText() + ".dxf    " + boolPDF + "   " + boolDXF);
+
     }
 
 
@@ -362,6 +422,7 @@ public class GetFilesFromARM extends JFrame {
     }
 
     private String viewPoziciya(Poziciya p) {
+        String gabarit = p.getGabariti() + " ".repeat(15 - p.getGabariti().length());
         StringBuilder sb = new StringBuilder();
         sb.append(addSpace(p.getFileName().replace(".dxf", ""), maxLengthFileName));
         sb.append("\t");
@@ -371,11 +432,13 @@ public class GetFilesFromARM extends JFrame {
         sb.append("\t");
         sb.append(p.getGeomMashines());
         sb.append("   ");
-        sb.append(p.getGabariti());
-        sb.append("   ");
-        sb.append(p.getFlagPDF());
-        sb.append("   ");
-        sb.append(p.getFlagDXF());
+        sb.append(gabarit);
+        if (viewPDFDXFCheckBox.isSelected()) {
+            sb.append("   ");
+            sb.append(p.getFlagPDF());
+            sb.append("   ");
+            sb.append(p.getFlagDXF());
+        }
         sb.append(System.lineSeparator());
         return sb.toString();
     }
