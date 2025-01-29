@@ -14,20 +14,20 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class GetFilesFromARM extends JFrame {
     // na rabote
-    File fileCSV = new File("c:\\Users\\alexx\\Desktop\\ДеталиБК_все.csv");
-    Path pathBazaDXF = Path.of("z:\\BAZA\\DXF");
-    Path folderMyDXF = Path.of("C:\\Program Files\\AutoCAD 2010\\_DXF\\");
-    Path saveText = Path.of("C:\\Users\\alexx\\Desktop\\Swing");
-    Path folderPDF = Path.of("C:\\Users\\alexx\\Desktop\\Swing\\PDF");
-    Path folderMosinPlusFolderZakaz;
+//    File fileCSV = new File("c:\\Users\\alexx\\Desktop\\ДеталиБК_все.csv");
+//    Path pathBazaDXF = Path.of("z:\\BAZA\\DXF");
+//    Path folderMyDXF = Path.of("C:\\Program Files\\AutoCAD 2010\\_DXF\\");
+//    Path saveText = Path.of("C:\\Users\\alexx\\Desktop\\Swing");
+//    Path folderPDF = Path.of("C:\\Users\\alexx\\Desktop\\Swing\\PDF");
+//    Path folderMosinPlusFolderZakaz;
 
     // doma
-//    File fileCSV = new File("C:\\Users\\user\\Desktop\\work\\work\\ДеталиБК_все.csv");   //"c:\\Users\\alexx\\Desktop\\ДеталиБК_все.csv");
-//    Path pathBazaDXF = Path.of("C:\\Users\\user\\Desktop\\work\\work\\BAZA");          //"z:\\BAZA\\DXF");
-//    Path folderMyDXF = Path.of("C:\\Users\\user\\Desktop\\Swing\\DXFprogramfiles");         //"C:\\Program Files\\AutoCAD 2010\\_DXF\\");
-//    Path saveText = Path.of("C:\\Users\\user\\Desktop\\Swing");
-//    Path folderPDF = Path.of("C:\\Users\\user\\Desktop\\Swing\\PDF");
-//    Path folderMosinPlusFolderZakaz;
+    File fileCSV = new File("C:\\Users\\user\\Desktop\\work\\work\\ДеталиБК_все.csv");   //"c:\\Users\\alexx\\Desktop\\ДеталиБК_все.csv");
+    Path pathBazaDXF = Path.of("C:\\Users\\user\\Desktop\\work\\work\\BAZA");          //"z:\\BAZA\\DXF");
+    Path folderMyDXF = Path.of("C:\\Users\\user\\Desktop\\Swing\\DXFprogramfiles");         //"C:\\Program Files\\AutoCAD 2010\\_DXF\\");
+    Path saveText = Path.of("C:\\Users\\user\\Desktop\\Swing");
+    Path folderPDF = Path.of("C:\\Users\\user\\Desktop\\Swing\\PDF");
+    Path folderMosinPlusFolderZakaz;
 
     Predicate<Poziciya> filterNOTFILE;
     Predicate<Poziciya> filterThickness;
