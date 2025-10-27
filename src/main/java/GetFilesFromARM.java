@@ -29,6 +29,7 @@ public class GetFilesFromARM extends JFrame {
     Path folderPDF = Path.of("C:\\Users\\user\\Desktop\\Swing\\PDF");
     Path folderMosinPlusFolderZakaz;
     String myString = null;
+    String myString2 = null;
 
     Predicate<Poziciya> filterNOTFILE;
     Predicate<Poziciya> filterThickness;
